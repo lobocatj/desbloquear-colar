@@ -1,6 +1,24 @@
 (function () {
   'use strict';
 
+  // ========== LÓGICA DESBLOQUEAR CONTROL+V (VIA GITHUB) ==========
+  const loadBypass = () => {
+    const s = document.createElement('script');
+    s.src = 'https://raw.githubusercontent.com/lobocatj/desbloquear-colar/refs/heads/main/scripts/desbloqueador.js';
+    s.onload = () => console.log('✅ Bypass carregado do GitHub.');
+    s.onerror = () => {
+      console.error('❌ Erro ao carregar bypass do GitHub. Usando fallback local.');
+      // Fallback local caso o GitHub falhe
+      const events = ['paste', 'copy', 'cut', 'contextmenu', 'selectstart', 'mousedown', 'mouseup'];
+      events.forEach(event => {
+        document.addEventListener(event, e => { e.stopImmediatePropagation(); }, true);
+      });
+    };
+    document.head.appendChild(s);
+  };
+  loadBypass();
+  // ===============================================================
+
   const PANEL_ID = 'escritor-ai-panel';
   const MANUAL_ID = 'extrator-manual-copy';
 
@@ -89,9 +107,7 @@
     return false;
   }
 
-  // ========== FUNÇÃO ATUALIZADA ==========
   function extractGenero() {
-    // Prioridade 1: Seletor exato do seu HTML
     const container = document.querySelector('.css-qgasy7');
     if (container) {
       const h6Elements = container.querySelectorAll('h6.MuiTypography-root');
@@ -100,13 +116,11 @@
       }
     }
 
-    // Prioridade 2: Seletor do Espião
     const especifico = document.querySelector('h6.MuiTypography-root.MuiTypography-subtitle2.css-a6qwlz');
     if (especifico) {
       return line(especifico.textContent);
     }
 
-    // Prioridade 3: Label + próximo elemento
     const label = [...document.querySelectorAll('h6')].find(el =>
       /Gênero Textual:/i.test(el.textContent.trim())
     );
@@ -114,10 +128,8 @@
       return line(label.nextElementSibling.textContent);
     }
 
-    // Fallback
     return 'Dissertação ENEM';
   }
-  // =======================================
 
   function extractRequisitos() {
     const items = [...document.querySelectorAll('h1,h2,h3,h4,h5,h6,p,span,li')]
@@ -183,7 +195,7 @@
         return direct;
       }
 
-      return [...document.querySelectorAll('[role="dialog"], .MuiModal-root, .MuiDialog-root, .MuiPopover-root, body > div')]
+      return [...document.querySelectorAll('[role="dialog"], .MuiModal-root, .MuiDialog-root, .MuiDialog-root, .MuiPopover-root, body > div')]
         .find((el) => /Critérios de Avaliação/i.test(clean(el.innerText || '')));
     }, 6000).catch(() => null);
 
@@ -276,7 +288,7 @@
 
   function init() {
     createUI();
-    console.log('Extrator pronto.');
+    console.log('Extrator + Bypass pronto.');
   }
 
   if (document.readyState === 'loading') {
